@@ -99,6 +99,11 @@ abstract contract ComposableStablePoolProtocolFees is
         return (virtualSupply + protocolFeeAmount, balances, currentInvariantWithLastJoinExitAmp);
     }
 
+    function _getProtocolFeePercentageOveride(uint256 ) internal pure returns (uint256) {
+        //Hardcoding protocol fee for all types to 10%
+        return 10e16;
+    }
+
     function _getProtocolPoolOwnershipPercentage(
         uint256[] memory balances,
         uint256 lastJoinExitAmp,
@@ -174,11 +179,11 @@ abstract contract ComposableStablePoolProtocolFees is
         // represent the percentage of Pool ownership the protocol should have due to each source.
 
         uint256 protocolSwapFeePercentage = swapFeeGrowthInvariantDelta.divDown(totalGrowthInvariant).mulDown(
-            getProtocolFeePercentageCache(ProtocolFeeType.SWAP)
+            _getProtocolFeePercentageOveride(ProtocolFeeType.SWAP)
         );
 
         uint256 protocolYieldPercentage = nonExemptYieldGrowthInvariantDelta.divDown(totalGrowthInvariant).mulDown(
-            getProtocolFeePercentageCache(ProtocolFeeType.YIELD)
+            _getProtocolFeePercentageOveride(ProtocolFeeType.YIELD)
         );
 
         // These percentages can then be simply added to compute the total protocol Pool ownership percentage.
@@ -270,7 +275,7 @@ abstract contract ComposableStablePoolProtocolFees is
             // To convert to a percentage of pool ownership, multiply by the rate,
             // then normalize against the final invariant
             uint256 protocolOwnershipPercentage = Math.divDown(
-                Math.mul(invariantDeltaFromFees, getProtocolFeePercentageCache(ProtocolFeeType.SWAP)),
+                Math.mul(invariantDeltaFromFees, _getProtocolFeePercentageOveride(ProtocolFeeType.SWAP)),
                 postJoinExitInvariant
             );
 
